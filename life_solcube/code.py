@@ -14,6 +14,8 @@ import framebufferio
 import rgbmatrix
 import digitalio
 import supervisor
+import time
+import math
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.digitalio import DigitalIO
 from adafruit_seesaw.pwmout import PWMOut
@@ -90,38 +92,38 @@ b'  + +   ',
 ]
 
 solcube = [
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'        ++++++  ++++++  +     ++++  ++  ++  +++++   ++++        ',
-b'        +    +  +    +  +     +  +  +    +  +    +  +  +        ',
-b'        +       +    +  +     +     +    +  +    +  +           ',
-b'        ++++++  +    +  +     +     +    +  +++++   ++++        ',
-b'             +  +    +  +     +     +    +  +    +  +           ',
-b'        +    +  +    +  +  +  +  +  +    +  +    +  +  +        ',
-b'        ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++        ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                ',
-b'                                                                '
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'        ++++++  ++++++  +     ++++  ++  ++  +++++   ++++       ',
+b'        +    +  +    +  +     +  +  +    +  +    +  +          ',
+b'        +       +    +  +     +     +    +  +    +  +          ',
+b'        ++++++  +    +  +     +     +    +  +++++   ++++       ',
+b'             +  +    +  +     +     +    +  +    +  +          ',
+b'        +    +  +    +  +  +  +  +  +    +  +    +  +          ',
+b'        ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++       ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                            ++            ++           ++      ',
+b'                           +  +          +  +         +  +     ',
+b'  +   +  +++ +++             +             +            +      ',
+b'  +   +  ++  ++              +             +            +      ',
+b'  +++ +  +   +++                                               ',
+b'                             +             +            +      ',
+#b'                                                               '
 ]
 
 g64p2h1v0 = [
@@ -258,17 +260,19 @@ all_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copper
 
 # You can add more effects in this loop. For instance, maybe you want to set the
 # color of each label to a different value.
-i = 1
-n = 1
-cube_map = "title"
+n = 0
+cube_map = 0
 
 life_iterations = 200
 button_led_timeouts=[0,0,0,0]
+button_led_direction=[0,0,0,0]
+button_debounce_timeout = [0,0,0,0]
+debounce_threshold = 1
 duty_cycle_ceiling = 65535
 duty_cycle_step = 8000
 
 button_down_step_timing = 250 #ms
-step_time = -1
+button_down_fast_step = 100 #ms
 
 
 
@@ -328,78 +332,140 @@ def randomize(output, fraction=0.33):
         output[i] = random.random() < fraction
 
 def clear_output(output):
-    randomize(output,-1)
-
-# Fill the grid with a bitmap
-def gridmap(output,bitst):
     for i in range(output.height * output.width):
         output[i] = 0
+
+# Fill the grid with a bitmap
+def gridmap(output,bitst,rando=False):
+    x_offset = (output.width - len(bitst[0]))//2
+    y_offset = 0
+    if rando:
+        # x_offset = pick a random x origin between 0 and (output.width - len(bitst[0]))
+        # y_offset = pick a random y origin between 0 and (output.height - len(bitst))
+        True
     for i, si in enumerate(bitst):
-        y = output.height - len(bitst) - 2 + i
+        y = output.height - len(bitst) - y_offset + i
+#        print("row " + str(i) + " at " + str(y))
         for j, cj in enumerate(si):
-            output[(output.width - 8)//2 + j, y] = cj & 1
+            x = x_offset + j
+#            print("col " + str(j) + " at " + str(x))
+            output[x, y] = cj & 1
 
-def step_timing(n):
-    if t > 0 and t % n == 0:
-        return True
-    return False
-
-def button_held_down(btn, without_press = False, timing = button_down_step_timing):
-    if without_press or buttons[btn].value:
-        if button_led_timeouts[btn] > duty_cycle_ceiling:
-            button_led_timeouts[btn] = 0
-            return True
-        elif button_led_timeouts[btn] > 0:
-            if step_timing(timing):
+def button_light_pulse(btn, without_press = False):
+    state = -1
+    if without_press or not buttons[btn].value:
+        if button_led_direction[btn] == 0: # up
+            if button_led_timeouts[btn] >= duty_cycle_ceiling:
+                button_led_direction[btn] = 1 # switch to down
+                state = 3
+            elif button_led_timeouts[btn] >= 0:
                 button_led_timeouts[btn] += duty_cycle_step
-                leds[btn].duty_cycle = button_led_timeouts[btn]
-    else:
-        if button_led_timeouts[btn] > 0:
-            button_led_timeouts[btn] -= duty_cycle_step
-            leds[btn].duty_cycle = button_led_timeouts[btn]
+                leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] < duty_cycle_ceiling else duty_cycle_ceiling
+                state = 2
+        else: # down
+            if button_led_timeouts[btn] > 0:
+                button_led_timeouts[btn] -= duty_cycle_step
+                leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] > 0 else 0
+                state = 1
+            else:
+                button_led_timeouts[btn] = 0
+                button_led_direction[btn] = 0 # switch to up
+                state = 0
+
+    return button_led_timeouts[btn], state
+
+def button_pushed(btn):
+    if not buttons[btn].value: #buttons pull low when pushed
+        if button_debounce_timeout[btn] > debounce_threshold:
+            button_led_timeouts[btn] = duty_cycle_ceiling
+            leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] < duty_cycle_ceiling else duty_cycle_ceiling
+            button_debounce_timeout[btn] = 0
+            return True 
         else:
+            button_debounce_timeout[btn] += 1
+            return False
+    else:
+        if button_debounce_timeout[btn] > 0:
             button_led_timeouts[btn] = 0
-    return False
+            leds[btn].duty_cycle = button_led_timeouts[btn]
+            button_debounce_timeout[btn] = 0
+        return False
 
 t = 0
+start_time = supervisor.ticks_ms()
+flash = 0
+clear_output(b1)
+last_flash_time = 0
+go = True
+sparse = False
 while True:
     t = supervisor.ticks_ms()
     buttons_down = [
-        button_held_down(0),
-        button_held_down(1),
-        button_held_down(2),
-        button_held_down(3)
+        button_pushed(0),
+        button_pushed(1),
+        button_pushed(2),
+        button_pushed(3),
     ]
-    if cube_map == "title":
+    if cube_map == 0:
         x = 1
         palette[1] = 0xffffff
         gridmap(b1,solcube)
         display.auto_refresh = True
-        
-        if buttons_down[0]:
-            cube_map = "life":
-        else:
-            if step_timing(2000) and not buttons[0].value  #every 2sec flash the leftmost button
-                button_held_down(0, True)
 
-    elif cube_map == "life":
+        flash += t - last_flash_time
+        if buttons_down[0]:
+            cube_map = 1
+            clear_output(b1)
+            randomize(b1)
+        else:
+            #print(str(flash))
+            if flash > 2000:  #every 2sec flash the leftmost button
+                dc,state = button_light_pulse(0, True)
+                #print("0 dc " + str(dc) + ', state: ' + str(state))
+            if flash > 0 and dc == 0:
+                last_flash_time = supervisor.ticks_ms()
+                flash = 0
+
+    elif cube_map == 1:
         # run 2*n generations.
         # For the Conway tribute on 64x32, 80 frames is appropriate.  For random
         # values, 400 frames seems like a good number.  Working in this way, with
         # two bitmaps, reduces copying data and makes the animation a bit faster
-        while n < life_iterations:
-            display.show(g1)
-            apply_life_rule(b1, b2)
-            display.show(g2)
-            apply_life_rule(b2, b1)
-            n += 1
 
-        # After 2*n generations, fill the board with random values and
-        # start over with a new color.
-        randomize(b1)
+        if n < life_iterations:
+            if buttons_down[0]: # drop a random glider on the board
+                gridmap(b1,random.choice(all_gliders))
+            if buttons_down[1]: # restart continuous playback
+                leds[1].duty_cycle = 0
+                go = True
+            if buttons_down[2]: # halt playback and advance 1
+                button_light_pulse(2, True)
+                go = False
+                advance = True
+            if buttons_down[3]: # 0: new rando board. 1: new sparse board, flipflop
+                clear_output(b1)
+                palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+                randomize(b1,0.01 if sparse else 0.33)
+                if sparse:
+                    sparse = False
+                else:
+                    sparse = True
 
-        # Pick a random color out of all.    
-        palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            if go or advance:
+                advance = False
+                display.show(g1)
+                apply_life_rule(b1, b2)
+                display.show(g2)
+                apply_life_rule(b2, b1)
+                n += 1
+        else:
+            # After 2*n generations, fill the board with random values and
+            # start over with a new color.
+            clear_output(b1)
+            randomize(b1)
 
-        n = 200
+            # Pick a random color out of all.    
+            palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+
+            n = 0
 
