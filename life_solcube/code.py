@@ -16,6 +16,7 @@ import digitalio
 import supervisor
 import time
 import math
+from adafruit_debouncer import Debouncer
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.digitalio import DigitalIO
 from adafruit_seesaw.pwmout import PWMOut
@@ -41,7 +42,7 @@ for button_pin in button_pins:
     button = DigitalIO(arcade_qt, button_pin)
     button.direction = digitalio.Direction.INPUT
     button.pull = digitalio.Pull.UP
-    buttons.append(button)
+    buttons.append(Debouncer(button, interval = 0.005))
 
 # LED pins in order (1, 2, 3, 4)
 led_pins = (12, 13, 0, 1)
@@ -104,6 +105,18 @@ b'                                                               ',
 b'                                                               ',
 b'                                                               ',
 b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
 b'        ++++++  ++++++  +     ++++  ++  ++  +++++   ++++       ',
 b'        +    +  +    +  +     +  +  +    +  +    +  +          ',
 b'        +       +    +  +     +     +    +  +    +  +          ',
@@ -117,13 +130,44 @@ b'                                                               ',
 b'                                                               ',
 b'                                                               ',
 b'                                                               ',
-b'                            ++            ++           ++      ',
-b'                           +  +          +  +         +  +     ',
-b'  +   +  +++ +++             +             +            +      ',
-b'  +   +  ++  ++              +             +            +      ',
-b'  +++ +  +   +++                                               ',
-b'                             +             +            +      ',
-#b'                                                               '
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               '
+]
+
+solcube_2 = [
+b'                                                  ',
+b' ++++++  ++++++  +     ++++  ++  ++  +++++   ++++ ',
+b' +    +  +    +  +     +  +  +    +  +    +  +    ',
+b' +       +    +  +     +     +    +  +    +  +    ',
+b' ++++++  +    +  +     +     +    +  +++++   ++++ ',
+b'      +  +    +  +     +     +    +  +    +  +    ',
+b' +    +  +    +  +  +  +  +  +    +  +    +  +    ',
+b' ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++ ',
+b'                                                  '
 ]
 
 g64p2h1v0 = [
@@ -238,8 +282,31 @@ b'   +      +   ',
 b'    ++  ++    '
 ]
 
-all_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copperhead,conway]
+def rotate_bitmatrix(g):
+    col = len(g)
+    row = len(g[0])
+    n = [[' ' for i in range(col)] for j in range(row)]
+    col -= 1
+    for i in g:
+        row = 0
+        for j in i:
+            n[row][col] = chr(j)
+            row += 1
+        col -= 1
+    nn = []
+    for i in n:
+        nn.append(str.encode(''.join(i)))
+    return nn
 
+unrotated_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copperhead,conway,solcube_2]
+all_gliders = []
+# add 3 copies of each glider, each rotated +90deg
+for i in unrotated_gliders:
+    all_gliders.append(i)
+    n = i
+    for j in range(3):
+        n = rotate_bitmatrix(n.copy())
+        all_gliders.append(n)
 
 
 
@@ -263,7 +330,7 @@ all_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copper
 n = 0
 cube_map = 0
 
-life_iterations = 200
+life_iterations = 300
 button_led_timeouts=[0,0,0,0]
 button_led_direction=[0,0,0,0]
 button_debounce_timeout = [0,0,0,0]
@@ -340,12 +407,12 @@ def gridmap(output,bitst,rando=False):
     x_offset = (output.width - len(bitst[0]))//2
     y_offset = 0
     if rando:
-        # x_offset = pick a random x origin between 0 and (output.width - len(bitst[0]))
-        # y_offset = pick a random y origin between 0 and (output.height - len(bitst))
-        True
+        x_offset = math.floor(random.random() * (output.width  - len(bitst[0])))
+        y_offset = math.floor(random.random() * (output.height - len(bitst)))
+        #print("x_offset,y_offset",x_offset,y_offset) 
     for i, si in enumerate(bitst):
         y = output.height - len(bitst) - y_offset + i
-#        print("row " + str(i) + " at " + str(y))
+        #print("row " + str(i) + " at " + str(y) + ", " + str(output.height) + ", " +  str(len(bitst)))
         for j, cj in enumerate(si):
             x = x_offset + j
 #            print("col " + str(j) + " at " + str(x))
@@ -374,8 +441,14 @@ def button_light_pulse(btn, without_press = False):
 
     return button_led_timeouts[btn], state
 
+def button_off(btn):
+    leds[btn].duty_cycle = 0
+
 def button_pushed(btn):
-    if not buttons[btn].value: #buttons pull low when pushed
+    buttons[btn].update()
+    if buttons[btn].fell:
+        leds[btn].duty_cycle = duty_cycle_ceiling
+        return True 
         if button_debounce_timeout[btn] > debounce_threshold:
             button_led_timeouts[btn] = duty_cycle_ceiling
             leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] < duty_cycle_ceiling else duty_cycle_ceiling
@@ -384,22 +457,24 @@ def button_pushed(btn):
         else:
             button_debounce_timeout[btn] += 1
             return False
-    else:
+    elif buttons[btn].rose:
+        leds[btn].duty_cycle = 0
+        return False
         if button_debounce_timeout[btn] > 0:
             button_led_timeouts[btn] = 0
             leds[btn].duty_cycle = button_led_timeouts[btn]
             button_debounce_timeout[btn] = 0
-        return False
 
-t = 0
+ticks = 0
 start_time = supervisor.ticks_ms()
 flash = 0
 clear_output(b1)
-last_flash_time = 0
+last_flash_time = start_time
 go = True
-sparse = False
+sparse = True
+palette[1] = 0xffffff
+
 while True:
-    t = supervisor.ticks_ms()
     buttons_down = [
         button_pushed(0),
         button_pushed(1),
@@ -407,24 +482,27 @@ while True:
         button_pushed(3),
     ]
     if cube_map == 0:
-        x = 1
-        palette[1] = 0xffffff
-        gridmap(b1,solcube)
-        display.auto_refresh = True
-
-        flash += t - last_flash_time
         if buttons_down[0]:
             cube_map = 1
+            palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            button_off(0)
             clear_output(b1)
             randomize(b1)
         else:
             #print(str(flash))
+            dc = -1
             if flash > 2000:  #every 2sec flash the leftmost button
                 dc,state = button_light_pulse(0, True)
-                #print("0 dc " + str(dc) + ', state: ' + str(state))
+                #print(str(flash) + " dc " + str(dc) + ', state: ' + str(state))
             if flash > 0 and dc == 0:
                 last_flash_time = supervisor.ticks_ms()
                 flash = 0
+
+            gridmap(b1,solcube)
+            display.auto_refresh = True
+
+            ticks = supervisor.ticks_ms()
+            flash += ticks - last_flash_time
 
     elif cube_map == 1:
         # run 2*n generations.
@@ -434,12 +512,10 @@ while True:
 
         if n < life_iterations:
             if buttons_down[0]: # drop a random glider on the board
-                gridmap(b1,random.choice(all_gliders))
+                gridmap(b1,random.choice(all_gliders),True)
             if buttons_down[1]: # restart continuous playback
-                leds[1].duty_cycle = 0
                 go = True
             if buttons_down[2]: # halt playback and advance 1
-                button_light_pulse(2, True)
                 go = False
                 advance = True
             if buttons_down[3]: # 0: new rando board. 1: new sparse board, flipflop
@@ -468,4 +544,5 @@ while True:
             palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
 
             n = 0
+
 
