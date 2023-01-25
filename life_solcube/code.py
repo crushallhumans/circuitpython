@@ -66,14 +66,29 @@ displayio.release_displays()
 # check the guide to find the pins and wiring diagrams for your board.
 # If you have a matrix with a different width or height, change that too.
 # If you have a 16x32 display, try with just a single line of text.
+
+#RP2040
 matrix = rgbmatrix.RGBMatrix(
     width=64, height=64, bit_depth=6,
     rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
-    addr_pins=[board.A5, board.A4, board.A3, board.A2],
+    addr_pins=[board.D25, board.D24, board.A3, board.A2],
     clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
+    doublebuffer=True,
     tile = 2,
     serpentine = True
 )
+
+
+
+#M4
+# matrix = rgbmatrix.RGBMatrix(
+#     width=64, height=64, bit_depth=6,
+#     rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
+#     addr_pins=[board.A5, board.A4, board.A3, board.A2],
+#     clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
+#     tile = 2,
+#     serpentine = True
+# )
 
 # Associate the RGB matrix with a Display so that we can use displayio features
 display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
@@ -117,6 +132,9 @@ b'                                                               ',
 b'                                                               ',
 b'                                                               ',
 b'                                                               ',
+b'                                                               ',
+b'                                                               ',
+b'                                                               ',
 b'        ++++++  ++++++  +     ++++  ++  ++  +++++   ++++       ',
 b'        +    +  +    +  +     +  +  +    +  +    +  +          ',
 b'        +       +    +  +     +     +    +  +    +  +          ',
@@ -124,9 +142,6 @@ b'        ++++++  +    +  +     +     +    +  +++++   ++++       ',
 b'             +  +    +  +     +     +    +  +    +  +          ',
 b'        +    +  +    +  +  +  +  +  +    +  +    +  +          ',
 b'        ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++       ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
 b'                                                               ',
 b'                                                               ',
 b'                                                               ',
