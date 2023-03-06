@@ -95,207 +95,277 @@ display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
 
 
 
-conway = [
-b'  +++   ',
-b'  + +   ',
-b'  + +   ',
-b'   +    ',
-b'+ +++   ',
-b' + + +  ',
-b'   +  + ',
-b'  + +   ',
-b'  + +   ',
+solcube = [
+b'         ++++++++++++++++              ++++++++++++++++         ',
+b'         ++++++++++++++++              ++++++++++++++++         ',
+b'         ++++++++++++++++              ++++++++++++++++         ',
+b'         ++++++++++++++++              ++++++++++++++++         ',
+b'         ++++++++++++++++              ++++++++++++++++         ',
+b'     +++++              ++++++    ++++++              +++++     ',
+b'     +++++              ++++++    ++++++              +++++     ',
+b'     +++++              ++++++    ++++++              +++++     ',
+b'     +++++              ++++++    ++++++              +++++     ',
+b'     +++++               +++++    +++++               +++++     ',
+b'+++++                    ++++++++++++++               ++++++++++',
+b'+++++                        +++++                         +++++',
+b'+++++                        +++++                         +++++',
+b'+++++                        +++++                         +++++',
+b'+++++                        +++++                         +++++',
+b'+++++                        +++++                         +++++',
+b'+++++                                                      +++++',
+b'+++++   ++++++  ++++++  +     ++++  +    +  +++++   ++++   +++++',
+b'+++++   +    +  +    +  +     +  +  +    +  +    +  +  +   +++++',
+b'+++++   +       +    +  +     +     +    +  +    +  +      +++++',
+b'+++++   +       +    +  +     +     +    +  +    +  +      +++++',
+b'+++++   +       +    +  +     +     +    +  +    +  +      +++++',
+b'+++++   +       +    +  +     +     +    +  +    +  +      +++++',
+b'+++++   ++++++  +    +  +     +     +    +  +++++   +++    +++++',
+b'+++++        +  +    +  +     +     +    +  +    +  +      +++++',
+b'+++++        +  +    +  +     +     +    +  +    +  +      +++++',
+b'+++++        +  +    +  +     +     +    +  +    +  +      +++++',
+b'+++++        +  +    +  +     +     +    +  +    +  +      +++++',
+b'+++++        +  +    +  +     +     +    +  +    +  +      +++++',
+b'+++++   +    +  +    +  +  +  +  +  +    +  +    +  +  +   +++++',
+b'+++++   ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++   +++++',
+b'+++++                                                     ++++++',
+b'     +++++                                            +++++     ',
+b'     +++++                                            +++++     ',
+b'     +++++                                            +++++     ',
+b'     +++++                                            +++++     ',
+b'     +++++                                           ++++++     ',
+b'     ++++++++++                                  ++++++++++     ',
+b'         ++++++                                  ++++++         ',
+b'         ++++++                                  ++++++         ',
+b'         ++++++                                  ++++++         ',
+b'         ++++++                                  ++++++         ',
+b'          +++++                             ++++++++++          ',
+b'              ++++++                        ++++++              ',
+b'              ++++++                        ++++++              ',
+b'              ++++++                        ++++++              ',
+b'              ++++++                        ++++++              ',
+b'              ++++++                   +++++++++++              ',
+b'                   ++++++              ++++++                   ',
+b'                   ++++++              ++++++                   ',
+b'                   ++++++              ++++++                   ',
+b'                   ++++++              ++++++                   ',
+b'                   ++++++              ++++++                   ',
+b'                    +++++++++      +++++++++                    ',
+b'                        ++++++    ++++++                        ',
+b'                        ++++++    ++++++                        ',
+b'                        ++++++    ++++++                        ',
+b'                        ++++++    ++++++                        ',
+b'                        ++++++++++++++++                        ',
+b'                             ++++++                             ',
+b'                             ++++++                             ',
+b'                             ++++++                             ',
+b'                             ++++++                             ',
+b'                             ++++++                             ',
 ]
 
-solcube = [
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'        ++++++  ++++++  +     ++++  ++  ++  +++++   ++++       ',
-b'        +    +  +    +  +     +  +  +    +  +    +  +          ',
-b'        +       +    +  +     +     +    +  +    +  +          ',
-b'        ++++++  +    +  +     +     +    +  +++++   ++++       ',
-b'             +  +    +  +     +     +    +  +    +  +          ',
-b'        +    +  +    +  +  +  +  +  +    +  +    +  +          ',
-b'        ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++       ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               ',
-b'                                                               '
+pawpatrol = [
+b'                                                                ',
+b'            ++++++++++++++++++++++++++++++++++++++++++          ',
+b'            ++++++++++++++++++++++++++++++++++++++++++          ',
+b'            ++++++++++++++++++++++++++++++++++++++++++          ',
+b'            ++++++++++++++++++++++++++++++++++++++++++          ',
+b'            ++++                                  ++++          ',
+b'            ++++                                  ++++          ',
+b'            ++++                                  ++++          ',
+b'            ++++                                  ++++          ',
+b'      ++++++++++           ++++++++++             ++++++++++    ',
+b'      +++++++              ++++++++++                +++++++    ',
+b'      +++++++              ++++++++++                +++++++    ',
+b'      +++++++           +++++++++++++++  +++++++     +++++++    ',
+b'      ++++              ++++        +++  +++++++        ++++    ',
+b'      ++++              ++++        +++  +++++++        ++++    ',
+b'      ++++              ++++        +++++++++++++++     ++++    ',
+b'      ++++              ++++        ++++++     ++++     ++++    ',
+b'      ++++              ++++        ++++++     ++++     ++++    ',
+b'      ++++     +++++++++++++        ++++++     +++++++  ++++    ',
+b'      ++++     +++++++++++++        +++           ++++  ++++    ',
+b'      ++++     +++++++++++++        +++           ++++  ++++    ',
+b'      ++++  +++++++++++++++++++     +++           ++++  ++++    ',
+b'      ++++  ++++           ++++     +++           ++++  ++++    ',
+b'      ++++  ++++           ++++     +++           ++++  ++++    ',
+b'      ++++  ++++           ++++++++++++     ++++++++++  ++++    ',
+b'      ++++  ++++              +++++++++     +++++++     ++++    ',
+b'      ++++  ++++              +++++++++     +++++++     ++++    ',
+b'      ++++  +++++++        ++++++++++++++++++++++++     ++++    ',
+b'      ++++     ++++        ++++       +++++++           ++++    ',
+b'      ++++     ++++        ++++       +++++++           ++++    ',
+b'      +++++++  +++++++  +++++++       ++++++++++     +++++++    ',
+b'         ++++     ++++  ++++                ++++     ++++       ',
+b'         ++++     ++++  ++++                ++++     ++++       ',
+b'         ++++     ++++++++++                ++++     ++++       ',
+b'         ++++        ++++                   ++++     ++++       ',
+b'         ++++        ++++                   ++++     ++++       ',
+b'         ++++        ++++                   ++++     ++++       ',
+b'         ++++        ++++                   ++++     ++++       ',
+b'         +++++++     ++++                   ++++  +++++++       ',
+b'            ++++     ++++                   ++++  ++++          ',
+b'            ++++     ++++                   ++++  ++++          ',
+b'            ++++     +++++++     +++++++++++++++  ++++          ',
+b'            ++++        ++++     ++++++++++++     ++++          ',
+b'            ++++        ++++     ++++++++++++     ++++          ',
+b'            +++++++     +++++++++++++++++++++  +++++++          ',
+b'               ++++        +++++++             ++++             ',
+b'               ++++        +++++++             ++++             ',
+b'               +++++++     +++++++          +++++++             ',
+b'                  ++++                      ++++                ',
+b'                  ++++                      ++++                ',
+b'                  +++++++                +++++++                ',
+b'                     ++++                ++++                   ',
+b'                     ++++                ++++                   ',
+b'                     +++++++          +++++++                   ',
+b'                        ++++          ++++                      ',
+b'                        ++++          ++++                      ',
+b'                        +++++++     ++++++                      ',
+b'                           ++++     +++                         ',
+b'                           ++++     +++                         ',
+b'                           ++++++++++++                         ',
+b'                              +++++++                           ',
+b'                              +++++++                           ',
+b'                              +++++++                           ',
+b'                                                                ',
 ]
+
+conway = [
+'  +++   ',
+'  + +   ',
+'  + +   ',
+'   +    ',
+'+ +++   ',
+' + + +  ',
+'   +  + ',
+'  + +   ',
+'  + +   ',
+]
+
 
 solcube_2 = [
-b'                                                  ',
-b' ++++++  ++++++  +     ++++  ++  ++  +++++   ++++ ',
-b' +    +  +    +  +     +  +  +    +  +    +  +    ',
-b' +       +    +  +     +     +    +  +    +  +    ',
-b' ++++++  +    +  +     +     +    +  +++++   ++++ ',
-b'      +  +    +  +     +     +    +  +    +  +    ',
-b' +    +  +    +  +  +  +  +  +    +  +    +  +    ',
-b' ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++ ',
-b'                                                  '
-]
-
-g64p2h1v0 = [
-b'    +++               +++    ',
-b'   +   +             +   +   ',
-b'  ++    +           +    ++  ',
-b' + + ++ ++   +++   ++ ++ + + ',
-b'++ +    + ++ +++ ++ +    + ++',
-b'    +   +    + +    +   +    ',
-b'           +     +           ',
-b'+       ++         ++       +'
-]
-
-g30p5h2v0 = [
-b'   +       ',
-b'  +++      ',
-b' ++ ++     ',
-b'           ',
-b'+ + + +  + ',
-b'+   +   +++',
-b'+   +      ',
-b'         + ',
-b'       + + ',
-b'        +  ',
-b'           '
-]
-
-copperhead = [
-b'++  ++',
-b'  ++  ',
-b'  ++  ',
-b' +  + ',
-b'      ',
-b'      ',
-b'      ',
-b'++  ++',
-b' ++++ ',
-b'      ',
-b'  ++  ',
-b'  ++  '
-]
-
-spider = [
-b'        +       +        ',
-b'  ++ + + ++   ++ + + ++  ',
-b'++ + +++         +++ + ++',
-b'   + +     + +     + +   ',
-b'   ++      + +      ++   ',
-b'++         + +         ++',
-b'++ ++               ++ ++',
-b'    +               +    '
+'                                                  ',
+' ++++++  ++++++  +     ++++  ++  ++  +++++   ++++ ',
+' +    +  +    +  +     +  +  +    +  +    +  +    ',
+' +       +    +  +     +     +    +  +    +  +    ',
+' ++++++  +    +  +     +     +    +  +++++   ++++ ',
+'      +  +    +  +     +     +    +  +    +  +    ',
+' +    +  +    +  +  +  +  +  +    +  +    +  +    ',
+' ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++ ',
+'                                                  '
 ]
 
 glider = [
-b'+',
-b' ',
-b'+'
+' + ',
+'  +',
+'+++',
 ]
 
-loafer = [
-b'++  + +',
-b'  +  ++',
-b'+ +    ',
-b' +     ',
-b'       ',
-b'     ++',
-b'    +  ',
-b'     + ',
-b'      +'
+g64p2h1v0 = [
+'     +++               +++     ',
+'    +   +             +   +    ',
+'   ++    +           +    ++   ',
+'  + + ++ ++   +++   ++ ++ + +  ',
+' ++ +    + ++ +++ ++ +    + ++ ',
+'+    +   +    + +    +   +    +',
+'            +     +            ',
+'++       ++         ++       ++',
+]
+
+g30p5h2v0 = [
+'    +        ',
+'   +++       ',
+'  ++ ++      ',
+'             ',
+' + + + +  +  ',
+'++   +   +++ ',
+'++   +      +',
+'          + +',
+'        + +  ',
+'         +  +',
+'            +',
 ]
 
 lobster = [
-b'           +++          ',
-b'           +            ',
-b'            +  ++       ',
-b'               ++       ',
-b'           ++           ',
-b'            ++          ',
-b'           +  +         ',
-b'                        ',
-b'             +  +       ',
-b'             +   +      ',
-b'              +++ +     ',
-b'                   +    ',
-b'+  + +             +    ',
-b' + ++             +     ',
-b'    +  ++             ++',
-b'     +   +      ++  ++  ',
-b' ++      +      +  +    ',
-b' ++    + +    ++        ',
-b'        +     +   +   + ',
-b'         +  +    ++     ',
-b'          ++   +     + +',
-b'              +        +',
-b'              +    +    ',
-b'             +   +      ',
-b'             +     ++   ',
-b'              +     +   '
+'            +++           ',
+'            +             ',
+'             +  ++        ',
+'                ++        ',
+'            ++            ',
+'             ++           ',
+'            +  +          ',
+'                          ',
+'              +  +        ',
+'              +   +       ',
+'               +++ +      ',
+'                    +     ',
+'++  + +             +     ',
+'+ + ++             +      ',
+'+    +  ++             ++ ',
+'      +   +      ++  ++  +',
+'  ++      +      +  +     ',
+'  ++    + +    ++         ',
+'         +     +   +   +  ',
+'          +  +    ++      ',
+'           ++   +     + + ',
+'               +        ++',
+'               +    +     ',
+'              +   +       ',
+'              +     ++    ',
+'               +     +    ',
+]
+
+spider = [
+'         +       +         ',
+'   ++ + + ++   ++ + + ++   ',
+'+++ + +++         +++ + +++',
+'+   + +     + +     + +   +',
+'    ++      + +      ++    ',
+' ++         + +         ++ ',
+' ++ ++               ++ ++ ',
+'     +               +     ',
+]
+
+loafer = [
+' ++  + ++',
+'+  +  ++ ',
+' + +     ',
+'  +      ',
+'        +',
+'      +++',
+'     +   ',
+'      +  ',
+'       ++',
+]
+
+copperhead = [
+' ++  ++ ',
+'   ++   ',
+'   ++   ',
+'+ +  + +',
+'+      +',
+'        ',
+'+      +',
+' ++  ++ ',
+'  ++++  ',
+'        ',
+'   ++   ',
+'   ++   ',
 ]
 
 weekender = [
-b'+            +',
-b'+            +',
-b' +          + ',
-b'+            +',
-b'+            +',
-b' +   ++++   + ',
-b'     ++++     ',
-b' ++++    ++++ ',
-b'              ',
-b'   +      +   ',
-b'    ++  ++    '
+' +            + ',
+' +            + ',
+'+ +          + +',
+' +            + ',
+' +            + ',
+'  +   ++++   +  ',
+'      ++++      ',
+'  ++++    ++++  ',
+'                ',
+'    +      +    ',
+'     ++  ++     ',
 ]
+
 
 def rotate_bitmatrix(g):
     col = len(g)
@@ -315,13 +385,36 @@ def rotate_bitmatrix(g):
 
 unrotated_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copperhead,conway,solcube_2]
 all_gliders = []
-# add 3 copies of each glider, each rotated +90deg
+
 for i in unrotated_gliders:
-    all_gliders.append(i)
-    n = i
+    # pad all gliders with 12 extra spaces and 8 extra lines, and a box
+    padded = []
+    padded_width = 0
+    for j in i:
+        j = '      ' + j
+        j = j + '      '
+        padded_width = len(j)
+        padded.append(str.encode(j))
+    vertical_spacer = str.encode(' ' * padded_width)
+    padded.insert(0,vertical_spacer)
+    padded.insert(0,vertical_spacer)
+    padded.insert(0,vertical_spacer)
+    padded.insert(0,vertical_spacer)
+    padded.append(vertical_spacer)
+    padded.append(vertical_spacer)
+    padded.append(vertical_spacer)
+    padded.append(vertical_spacer)
+#    vertical_spacer_x = str.encode('+' * padded_width)
+#    padded.insert(0,vertical_spacer_x)
+#    padded.append(vertical_spacer_x)
+
+    all_gliders.append(padded.copy())
+
+    # add 3 copies of each glider, each rotated +90deg
+    n = padded
     for j in range(3):
         n = rotate_bitmatrix(n.copy())
-        all_gliders.append(n)
+        all_gliders.append(n.copy())
 
 
 
@@ -487,7 +580,7 @@ clear_output(b1)
 last_flash_time = start_time
 go = True
 sparse = True
-palette[1] = 0xffffff
+palette[1] = 0xff0000
 
 while True:
     buttons_down = [
@@ -496,13 +589,13 @@ while True:
         button_pushed(2),
         button_pushed(3),
     ]
-    if cube_map == 0:
+    if cube_map == 0 or cube_map == 2:
         if buttons_down[0]:
             cube_map = 1
             palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
             button_off(0)
-            clear_output(b1)
-            randomize(b1)
+#            clear_output(b1)
+#            randomize(b1)
         else:
             #print(str(flash))
             dc = -1
@@ -513,11 +606,13 @@ while True:
                 last_flash_time = supervisor.ticks_ms()
                 flash = 0
 
-            gridmap(b1,solcube)
+            gridmap(b1,solcube if cube_map == 0 else pawpatrol)
             display.auto_refresh = True
-
+            
             ticks = supervisor.ticks_ms()
             flash += ticks - last_flash_time
+            go = True
+            advance = False
 
     elif cube_map == 1:
         # run 2*n generations.
@@ -530,24 +625,45 @@ while True:
                 gridmap(b1,random.choice(all_gliders),True)
             if buttons_down[1]: # restart continuous playback
                 go = True
+                advance = False
             if buttons_down[2]: # halt playback and advance 1
                 go = False
                 advance = True
-            if buttons_down[3]: # 0: new rando board. 1: new sparse board, flipflop
-                clear_output(b1)
-                palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
-                randomize(b1,0.01 if sparse else 0.33)
+            if buttons_down[3]: # 0: new rando board. 1: PAW Patrol, flipflop
+                n = 0
                 if sparse:
+                    clear_output(b1)
+                    palette[1] = 0xff0000
+                    display.show(g1)
+                    print('display.show(g1)')
+                    gridmap(b1,pawpatrol)
+                    print('gridmap(b1,pawpatrol)')
+                    #display.show(g2)
+                    #print('display.show(g2)')
+                    cube_map = 2 # go back to initial phase
+                    go = False
+                    advance = False
                     sparse = False
                 else:
+                    clear_output(b1)
+                    randomize(b1,0.33)
+                    palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+                    go = True
+                    advance = False
                     sparse = True
 
             if go or advance:
                 advance = False
-                display.show(g1)
-                apply_life_rule(b1, b2)
-                display.show(g2)
-                apply_life_rule(b2, b1)
+                if (n > 0) and ((n % 20) == 0):
+                    display.show(g1)
+                    gridmap(b1,random.choice(all_gliders),True)
+                    display.show(g2)
+                else:
+                    display.show(g1)
+                    apply_life_rule(b1, b2)
+                    display.show(g2)
+                    apply_life_rule(b2, b1)
+
                 n += 1
         else:
             # After 2*n generations, fill the board with random values and
@@ -561,3 +677,133 @@ while True:
             n = 0
 
 
+gliders = """
+!Name: Glider
+!Author: Richard K. Guy
+!The smallest, most common, and first discovered spaceship.
+!www.conwaylife.com/wiki/index.php?title=Glider
+.O.
+..O
+OOO
+
+!Name: 64P2H1V0
+!Author: Dean Hickerson
+!The smallest period 2 spaceship, discovered on July 28, 1989
+!www.conwaylife.com/wiki/index.php?title=64P2H1V0
+.....OOO...............OOO.....
+....O...O.............O...O....
+...OO....O...........O....OO...
+..O.O.OO.OO...OOO...OO.OO.O.O..
+.OO.O....O.OO.OOO.OO.O....O.OO.
+O....O...O....O.O....O...O....O
+............O.....O............
+OO.......OO.........OO.......OO
+
+!Name: 30P5H2V0
+!Author: Paul Tooke
+!An orthogonal spaceship with period 5. The smallest known 2c/5 spaceship.
+!www.conwaylife.com/wiki/index.php?title=30P5H2V0
+....O........
+...OOO.......
+..OO.OO......
+.............
+.O.O.O.O..O..
+OO...O...OOO.
+OO...O......O
+..........O.O
+........O.O..
+.........O..O
+............O
+
+! lobster.cells
+! Matthias Merzenich, 2011
+! https://conwaylife.com/wiki/Lobster_(spaceship)
+! https://www.conwaylife.com/patterns/lobster.cells
+............OOO...........
+............O.............
+.............O..OO........
+................OO........
+............OO............
+.............OO...........
+............O..O..........
+..........................
+..............O..O........
+..............O...O.......
+...............OOO.O......
+....................O.....
+OO..O.O.............O.....
+O.O.OO.............O......
+O....O..OO.............OO.
+......O...O......OO..OO..O
+..OO......O......O..O.....
+..OO....O.O....OO.........
+.........O.....O...O...O..
+..........O..O....OO......
+...........OO...O.....O.O.
+...............O........OO
+...............O....O.....
+..............O...O.......
+..............O.....OO....
+...............O.....O....
+
+!Name: Spider
+!Author: David Bell
+!A c/5 period 5 orthogonal spaceship found in April 1997. It is the smallest known c/5 spaceship.
+!www.conwaylife.com/wiki/index.php?title=Spider
+.........O.......O.........
+...OO.O.O.OO...OO.O.O.OO...
+OOO.O.OOO.........OOO.O.OOO
+O...O.O.....O.O.....O.O...O
+....OO......O.O......OO....
+.OO.........O.O.........OO.
+.OO.OO...............OO.OO.
+.....O...............O.....
+
+! loafer.cells
+! Josh Ball
+! small c/7 orthogonal spaceship found 17 February 2013
+! https://www.conwaylife.com/forums/viewtopic.php?f=2&t=1031#p7450
+! https://conwaylife.com/wiki/Loafer
+.OO..O.OO
+O..O..OO.
+.O.O.....
+..O......
+........O
+......OOO
+.....O...
+......O..
+.......OO
+
+! Copperhead
+! 'zdr'
+! An c/10 orthogonal spaceship found on March 5, 2016.
+! https://www.conwaylife.com/wiki/Copperhead
+.OO..OO.
+...OO...
+...OO...
+O.O..O.O
+O......O
+........
+O......O
+.OO..OO.
+..OOOO..
+........
+...OO...
+...OO...
+
+!Name: Weekender
+!Author: David Eppstein
+!A period 7 spaceship with speed 2c/7.
+!www.conwaylife.com/wiki/index.php?title=Weekender
+.O............O.
+.O............O.
+O.O..........O.O
+.O............O.
+.O............O.
+..O...OOOO...O..
+......OOOO......
+..OOOO....OOOO..
+................
+....O......O....
+.....OO..OO.....
+"""
