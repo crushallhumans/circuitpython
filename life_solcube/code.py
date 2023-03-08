@@ -1,11 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Jeff Epler for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
-# This example implements a simple two line scroller using
-# Adafruit_CircuitPython_Display_Text. Each line has its own color
-# and it is possible to modify the example to use other fonts and non-standard
-# characters.
+#solcube - 20230306
 
 import random
 import board
@@ -51,44 +44,29 @@ for led_pin in led_pins:
     led = PWMOut(arcade_qt, led_pin)
     leds.append(led)
     
-    
-# If there was a display before (protomatter, LCD, or E-paper), release it so
-# we can create ours
 displayio.release_displays()
 
-# This next call creates the RGB Matrix object itself. It has the given width
-# and height. bit_depth can range from 1 to 6; higher numbers allow more color
-# shades to be displayed, but increase memory usage and slow down your Python
-# code. If you just want to show primary colors plus black and white, use 1.
-# Otherwise, try 3, 4 and 5 to see which effect you like best.
-#
-# These lines are for the Feather M4 Express. If you're using a different board,
-# check the guide to find the pins and wiring diagrams for your board.
-# If you have a matrix with a different width or height, change that too.
-# If you have a 16x32 display, try with just a single line of text.
-
+bit_depth_set = 3
 #RP2040
-matrix = rgbmatrix.RGBMatrix(
-    width=64, height=64, bit_depth=6,
-    rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
-    addr_pins=[board.D25, board.D24, board.A3, board.A2],
-    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
-    doublebuffer=True,
-    tile = 2,
-    serpentine = True
-)
-
-
-
-#M4
 # matrix = rgbmatrix.RGBMatrix(
-#     width=64, height=64, bit_depth=6,
+#     width=64, height=64, bit_depth=bit_depth_set,
 #     rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
-#     addr_pins=[board.A5, board.A4, board.A3, board.A2],
+#     addr_pins=[board.D25, board.D24, board.A3, board.A2],
 #     clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
+#     doublebuffer=True,
 #     tile = 2,
 #     serpentine = True
 # )
+
+#M4
+matrix = rgbmatrix.RGBMatrix(
+    width=64, height=64, bit_depth=bit_depth_set,
+    rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
+    addr_pins=[board.A5, board.A4, board.A3, board.A2],
+    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
+    tile = 2,
+    serpentine = True
+)
 
 # Associate the RGB matrix with a Display so that we can use displayio features
 display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
@@ -677,133 +655,133 @@ while True:
             n = 0
 
 
-gliders = """
-!Name: Glider
-!Author: Richard K. Guy
-!The smallest, most common, and first discovered spaceship.
-!www.conwaylife.com/wiki/index.php?title=Glider
-.O.
-..O
-OOO
+# gliders = """
+# !Name: Glider
+# !Author: Richard K. Guy
+# !The smallest, most common, and first discovered spaceship.
+# !www.conwaylife.com/wiki/index.php?title=Glider
+# .O.
+# ..O
+# OOO
 
-!Name: 64P2H1V0
-!Author: Dean Hickerson
-!The smallest period 2 spaceship, discovered on July 28, 1989
-!www.conwaylife.com/wiki/index.php?title=64P2H1V0
-.....OOO...............OOO.....
-....O...O.............O...O....
-...OO....O...........O....OO...
-..O.O.OO.OO...OOO...OO.OO.O.O..
-.OO.O....O.OO.OOO.OO.O....O.OO.
-O....O...O....O.O....O...O....O
-............O.....O............
-OO.......OO.........OO.......OO
+# !Name: 64P2H1V0
+# !Author: Dean Hickerson
+# !The smallest period 2 spaceship, discovered on July 28, 1989
+# !www.conwaylife.com/wiki/index.php?title=64P2H1V0
+# .....OOO...............OOO.....
+# ....O...O.............O...O....
+# ...OO....O...........O....OO...
+# ..O.O.OO.OO...OOO...OO.OO.O.O..
+# .OO.O....O.OO.OOO.OO.O....O.OO.
+# O....O...O....O.O....O...O....O
+# ............O.....O............
+# OO.......OO.........OO.......OO
 
-!Name: 30P5H2V0
-!Author: Paul Tooke
-!An orthogonal spaceship with period 5. The smallest known 2c/5 spaceship.
-!www.conwaylife.com/wiki/index.php?title=30P5H2V0
-....O........
-...OOO.......
-..OO.OO......
-.............
-.O.O.O.O..O..
-OO...O...OOO.
-OO...O......O
-..........O.O
-........O.O..
-.........O..O
-............O
+# !Name: 30P5H2V0
+# !Author: Paul Tooke
+# !An orthogonal spaceship with period 5. The smallest known 2c/5 spaceship.
+# !www.conwaylife.com/wiki/index.php?title=30P5H2V0
+# ....O........
+# ...OOO.......
+# ..OO.OO......
+# .............
+# .O.O.O.O..O..
+# OO...O...OOO.
+# OO...O......O
+# ..........O.O
+# ........O.O..
+# .........O..O
+# ............O
 
-! lobster.cells
-! Matthias Merzenich, 2011
-! https://conwaylife.com/wiki/Lobster_(spaceship)
-! https://www.conwaylife.com/patterns/lobster.cells
-............OOO...........
-............O.............
-.............O..OO........
-................OO........
-............OO............
-.............OO...........
-............O..O..........
-..........................
-..............O..O........
-..............O...O.......
-...............OOO.O......
-....................O.....
-OO..O.O.............O.....
-O.O.OO.............O......
-O....O..OO.............OO.
-......O...O......OO..OO..O
-..OO......O......O..O.....
-..OO....O.O....OO.........
-.........O.....O...O...O..
-..........O..O....OO......
-...........OO...O.....O.O.
-...............O........OO
-...............O....O.....
-..............O...O.......
-..............O.....OO....
-...............O.....O....
+# ! lobster.cells
+# ! Matthias Merzenich, 2011
+# ! https://conwaylife.com/wiki/Lobster_(spaceship)
+# ! https://www.conwaylife.com/patterns/lobster.cells
+# ............OOO...........
+# ............O.............
+# .............O..OO........
+# ................OO........
+# ............OO............
+# .............OO...........
+# ............O..O..........
+# ..........................
+# ..............O..O........
+# ..............O...O.......
+# ...............OOO.O......
+# ....................O.....
+# OO..O.O.............O.....
+# O.O.OO.............O......
+# O....O..OO.............OO.
+# ......O...O......OO..OO..O
+# ..OO......O......O..O.....
+# ..OO....O.O....OO.........
+# .........O.....O...O...O..
+# ..........O..O....OO......
+# ...........OO...O.....O.O.
+# ...............O........OO
+# ...............O....O.....
+# ..............O...O.......
+# ..............O.....OO....
+# ...............O.....O....
 
-!Name: Spider
-!Author: David Bell
-!A c/5 period 5 orthogonal spaceship found in April 1997. It is the smallest known c/5 spaceship.
-!www.conwaylife.com/wiki/index.php?title=Spider
-.........O.......O.........
-...OO.O.O.OO...OO.O.O.OO...
-OOO.O.OOO.........OOO.O.OOO
-O...O.O.....O.O.....O.O...O
-....OO......O.O......OO....
-.OO.........O.O.........OO.
-.OO.OO...............OO.OO.
-.....O...............O.....
+# !Name: Spider
+# !Author: David Bell
+# !A c/5 period 5 orthogonal spaceship found in April 1997. It is the smallest known c/5 spaceship.
+# !www.conwaylife.com/wiki/index.php?title=Spider
+# .........O.......O.........
+# ...OO.O.O.OO...OO.O.O.OO...
+# OOO.O.OOO.........OOO.O.OOO
+# O...O.O.....O.O.....O.O...O
+# ....OO......O.O......OO....
+# .OO.........O.O.........OO.
+# .OO.OO...............OO.OO.
+# .....O...............O.....
 
-! loafer.cells
-! Josh Ball
-! small c/7 orthogonal spaceship found 17 February 2013
-! https://www.conwaylife.com/forums/viewtopic.php?f=2&t=1031#p7450
-! https://conwaylife.com/wiki/Loafer
-.OO..O.OO
-O..O..OO.
-.O.O.....
-..O......
-........O
-......OOO
-.....O...
-......O..
-.......OO
+# ! loafer.cells
+# ! Josh Ball
+# ! small c/7 orthogonal spaceship found 17 February 2013
+# ! https://www.conwaylife.com/forums/viewtopic.php?f=2&t=1031#p7450
+# ! https://conwaylife.com/wiki/Loafer
+# .OO..O.OO
+# O..O..OO.
+# .O.O.....
+# ..O......
+# ........O
+# ......OOO
+# .....O...
+# ......O..
+# .......OO
 
-! Copperhead
-! 'zdr'
-! An c/10 orthogonal spaceship found on March 5, 2016.
-! https://www.conwaylife.com/wiki/Copperhead
-.OO..OO.
-...OO...
-...OO...
-O.O..O.O
-O......O
-........
-O......O
-.OO..OO.
-..OOOO..
-........
-...OO...
-...OO...
+# ! Copperhead
+# ! 'zdr'
+# ! An c/10 orthogonal spaceship found on March 5, 2016.
+# ! https://www.conwaylife.com/wiki/Copperhead
+# .OO..OO.
+# ...OO...
+# ...OO...
+# O.O..O.O
+# O......O
+# ........
+# O......O
+# .OO..OO.
+# ..OOOO..
+# ........
+# ...OO...
+# ...OO...
 
-!Name: Weekender
-!Author: David Eppstein
-!A period 7 spaceship with speed 2c/7.
-!www.conwaylife.com/wiki/index.php?title=Weekender
-.O............O.
-.O............O.
-O.O..........O.O
-.O............O.
-.O............O.
-..O...OOOO...O..
-......OOOO......
-..OOOO....OOOO..
-................
-....O......O....
-.....OO..OO.....
-"""
+# !Name: Weekender
+# !Author: David Eppstein
+# !A period 7 spaceship with speed 2c/7.
+# !www.conwaylife.com/wiki/index.php?title=Weekender
+# .O............O.
+# .O............O.
+# O.O..........O.O
+# .O............O.
+# .O............O.
+# ..O...OOOO...O..
+# ......OOOO......
+# ..OOOO....OOOO..
+# ................
+# ....O......O....
+# .....OO..OO.....
+# """
