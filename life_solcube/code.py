@@ -1,4 +1,5 @@
 #solcube - 20230306
+board_type = 'RP2040'
 
 import random
 import board
@@ -46,27 +47,30 @@ for led_pin in led_pins:
     
 displayio.release_displays()
 
-bit_depth_set = 3
-#RP2040
-# matrix = rgbmatrix.RGBMatrix(
-#     width=64, height=64, bit_depth=bit_depth_set,
-#     rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
-#     addr_pins=[board.D25, board.D24, board.A3, board.A2],
-#     clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
-#     doublebuffer=True,
-#     tile = 2,
-#     serpentine = True
-# )
+bit_depth_set = 2
+matrix = False
 
-#M4
-matrix = rgbmatrix.RGBMatrix(
-    width=64, height=64, bit_depth=bit_depth_set,
-    rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
-    addr_pins=[board.A5, board.A4, board.A3, board.A2],
-    clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
-    tile = 2,
-    serpentine = True
-)
+if board_type == 'RP2040':
+    #RP2040
+    matrix = rgbmatrix.RGBMatrix(
+        width=64, height=64, bit_depth=bit_depth_set,
+        rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
+        addr_pins=[board.D25, board.D24, board.A3, board.A2],
+        clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
+        doublebuffer=True,
+        tile = 2,
+        serpentine = True
+    )
+else:
+    #M4
+    matrix = rgbmatrix.RGBMatrix(
+        width=64, height=64, bit_depth=bit_depth_set,
+        rgb_pins=[board.D6, board.D5, board.D9, board.D11, board.D10, board.D12],
+        addr_pins=[board.A5, board.A4, board.A3, board.A2],
+        clock_pin=board.D13, latch_pin=board.D0, output_enable_pin=board.D1,
+        tile = 2,
+        serpentine = True
+    )
 
 # Associate the RGB matrix with a Display so that we can use displayio features
 display = framebufferio.FramebufferDisplay(matrix, auto_refresh=False)
@@ -527,6 +531,17 @@ def button_light_pulse(btn, without_press = False):
 
     return button_led_timeouts[btn], state
 
+def nonblack_randomcolor():
+    r = 0
+    g = 0
+    b = 0
+    while not (r or g or b):
+        r = random.randint(0,255)
+        g = random.randint(0,255)
+        b = random.randint(0,255)
+    return (r,g,b)
+
+
 def button_off(btn):
     leds[btn].duty_cycle = 0
 
@@ -570,7 +585,7 @@ while True:
     if cube_map == 0 or cube_map == 2:
         if buttons_down[0]:
             cube_map = 1
-            palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            palette[1] = nonblack_randomcolor()
             button_off(0)
 #            clear_output(b1)
 #            randomize(b1)
@@ -613,9 +628,9 @@ while True:
                     clear_output(b1)
                     palette[1] = 0xff0000
                     display.show(g1)
-                    print('display.show(g1)')
+                    #print('display.show(g1)')
                     gridmap(b1,pawpatrol)
-                    print('gridmap(b1,pawpatrol)')
+                    #print('gridmap(b1,pawpatrol)')
                     #display.show(g2)
                     #print('display.show(g2)')
                     cube_map = 2 # go back to initial phase
@@ -625,7 +640,7 @@ while True:
                 else:
                     clear_output(b1)
                     randomize(b1,0.33)
-                    palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+                    palette[1] = nonblack_randomcolor()
                     go = True
                     advance = False
                     sparse = True
@@ -650,7 +665,7 @@ while True:
             randomize(b1)
 
             # Pick a random color out of all.    
-            palette[1] = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
+            palette[1] = nonblack_randomcolor()
 
             n = 0
 
