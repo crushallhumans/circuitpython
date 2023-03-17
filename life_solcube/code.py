@@ -369,14 +369,14 @@ unrotated_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,
 all_gliders = []
 
 for i in unrotated_gliders:
-    # pad all gliders with 12 extra spaces and 8 extra lines, and a box
+    # pad all gliders with 12 extra spaces and 8 extra lines
     padded = []
     padded_width = 0
     for j in i:
-        j = '      ' + j
-        j = j + '      '
-        padded_width = len(j)
-        padded.append(str.encode(j))
+        jj = '      ' + j
+        jj = jj + '      '
+        padded_width = len(jj)
+        padded.append(str.encode(jj))
     vertical_spacer = str.encode(' ' * padded_width)
     padded.insert(0,vertical_spacer)
     padded.insert(0,vertical_spacer)
@@ -386,9 +386,6 @@ for i in unrotated_gliders:
     padded.append(vertical_spacer)
     padded.append(vertical_spacer)
     padded.append(vertical_spacer)
-#    vertical_spacer_x = str.encode('+' * padded_width)
-#    padded.insert(0,vertical_spacer_x)
-#    padded.append(vertical_spacer_x)
 
     all_gliders.append(padded.copy())
 
@@ -465,7 +462,6 @@ g2.append(tg2)
 # a single number [x + width * y] is used instead of indexing with [x, y].
 # This makes the animation run faster with some loss of clarity. More
 # optimizations are probably possible.
-
 def apply_life_rule(old, new):
     width = old.width
     height = old.height
@@ -499,13 +495,10 @@ def gridmap(output,bitst,rando=False):
     if rando:
         x_offset = math.floor(random.random() * (output.width  - len(bitst[0])))
         y_offset = math.floor(random.random() * (output.height - len(bitst)))
-        #print("x_offset,y_offset",x_offset,y_offset) 
     for i, si in enumerate(bitst):
         y = output.height - len(bitst) - y_offset + i
-        #print("row " + str(i) + " at " + str(y) + ", " + str(output.height) + ", " +  str(len(bitst)))
         for j, cj in enumerate(si):
             x = x_offset + j
-#            print("col " + str(j) + " at " + str(x))
             output[x, y] = cj & 1
 
 def button_light_pulse(btn, without_press = False):
@@ -550,21 +543,21 @@ def button_pushed(btn):
     if buttons[btn].fell:
         leds[btn].duty_cycle = duty_cycle_ceiling
         return True 
-        if button_debounce_timeout[btn] > debounce_threshold:
-            button_led_timeouts[btn] = duty_cycle_ceiling
-            leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] < duty_cycle_ceiling else duty_cycle_ceiling
-            button_debounce_timeout[btn] = 0
-            return True 
-        else:
-            button_debounce_timeout[btn] += 1
-            return False
+        # if button_debounce_timeout[btn] > debounce_threshold:
+        #     button_led_timeouts[btn] = duty_cycle_ceiling
+        #     leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] < duty_cycle_ceiling else duty_cycle_ceiling
+        #     button_debounce_timeout[btn] = 0
+        #     return True 
+        # else:
+        #     button_debounce_timeout[btn] += 1
+        #     return False
     elif buttons[btn].rose:
         leds[btn].duty_cycle = 0
         return False
-        if button_debounce_timeout[btn] > 0:
-            button_led_timeouts[btn] = 0
-            leds[btn].duty_cycle = button_led_timeouts[btn]
-            button_debounce_timeout[btn] = 0
+        # if button_debounce_timeout[btn] > 0:
+        #     button_led_timeouts[btn] = 0
+        #     leds[btn].duty_cycle = button_led_timeouts[btn]
+        #     button_debounce_timeout[btn] = 0
 
 ticks = 0
 start_time = supervisor.ticks_ms()
@@ -628,12 +621,10 @@ while True:
                     clear_output(b1)
                     palette[1] = 0xff0000
                     display.show(g1)
-                    #print('display.show(g1)')
+
                     gridmap(b1,pawpatrol)
-                    #print('gridmap(b1,pawpatrol)')
-                    #display.show(g2)
-                    #print('display.show(g2)')
                     cube_map = 2 # go back to initial phase
+
                     go = False
                     advance = False
                     sparse = False
