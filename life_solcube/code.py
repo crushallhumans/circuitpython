@@ -23,20 +23,18 @@ delay = 0.001
 
 # For most boards.
 i2c = board.I2C()
-
-# For the QT Py RP2040, QT Py ESP32-S2, other boards that have SCL1/SDA1 as the STEMMA QT port.
-# import busio
-# i2c = busio.I2C(board.SCL1, board.SDA1)
 arcade_qt = Seesaw(i2c, addr=0x3A)
 
 # Button pins in order (1, 2, 3, 4)
 button_pins = (18, 19, 20, 2)
 buttons = []
+buttons_raw = []
 for button_pin in button_pins:
     button = DigitalIO(arcade_qt, button_pin)
     button.direction = digitalio.Direction.INPUT
     button.pull = digitalio.Pull.UP
-    buttons.append(Debouncer(button, interval = 0.005))
+    buttons_raw.append(button)
+    buttons.append(Debouncer(button))
 
 # LED pins in order (1, 2, 3, 4)
 led_pins = (12, 13, 0, 1)
@@ -465,19 +463,19 @@ g2.append(tg2)
 def apply_life_rule(old, new):
     width = old.width
     height = old.height
-    for y in range(height):
-        yyy = y * width
-        ym1 = ((y + height - 1) % height) * width
-        yp1 = ((y + 1) % height) * width
+    for c_y in range(height):
+        yyy = c_y * width
+        ym1 = ((c_y + height - 1) % height) * width
+        yp1 = ((c_y + 1) % height) * width
         xm1 = width - 1
-        for x in range(width):
-            xp1 = (x + 1) % width
+        for c_x in range(width):
+            xp1 = (c_x + 1) % width
             neighbors = (
-                old[xm1 + ym1] + old[xm1 + yyy] + old[xm1 + yp1] +
-                old[x   + ym1] +                  old[x   + yp1] +
-                old[xp1 + ym1] + old[xp1 + yyy] + old[xp1 + yp1])
-            new[x+yyy] = neighbors == 3 or (neighbors == 2 and old[x+yyy])
-            xm1 = x
+                old[xm1 + ym1]      + old[xm1 + yyy] + old[xm1 + yp1] +
+                old[c_x   + ym1]    +                  old[c_x   + yp1] +
+                old[xp1 + ym1]      + old[xp1 + yyy] + old[xp1 + yp1])
+            new[c_x+yyy] = neighbors == 3 or (neighbors == 2 and old[c_x+yyy])
+            xm1 = c_x
 
 # Fill 'fraction' out of all the cells.
 def randomize(output, fraction=0.33):
@@ -567,16 +565,20 @@ last_flash_time = start_time
 go = True
 sparse = True
 palette[1] = 0xff0000
+up = True
 
-while True:
-    buttons_down = [
+def buttons_update_all():
+    return [
         button_pushed(0),
         button_pushed(1),
         button_pushed(2),
         button_pushed(3),
     ]
+
+while True:
     if cube_map == 0 or cube_map == 2:
-        if buttons_down[0]:
+        button_off(2)
+        if not buttons_raw[0].value:
             cube_map = 1
             palette[1] = nonblack_randomcolor()
             button_off(0)
@@ -607,15 +609,19 @@ while True:
         # two bitmaps, reduces copying data and makes the animation a bit faster
 
         if n < life_iterations:
-            if buttons_down[0]: # drop a random glider on the board
-                gridmap(b1,random.choice(all_gliders),True)
-            if buttons_down[1]: # restart continuous playback
+            if not buttons_raw[0].value: # drop a random glider on the board
+                if up:
+                    gridmap(b1,random.choice(all_gliders),True)
+                else:
+                    gridmap(b2,random.choice(all_gliders),True)
+                n = 0
+            if not buttons_raw[1].value: # restart continuous playback
                 go = True
                 advance = False
-            if buttons_down[2]: # halt playback and advance 1
+            if not buttons_raw[2].value: # halt playback and advance 1
                 go = False
                 advance = True
-            if buttons_down[3]: # 0: new rando board. 1: PAW Patrol, flipflop
+            if not buttons_raw[3].value: # 0: new rando board. 1: PAW Patrol, flipflop
                 n = 0
                 if sparse:
                     clear_output(b1)
@@ -636,17 +642,28 @@ while True:
                     advance = False
                     sparse = True
 
+            if not go:
+                dc,state = button_light_pulse(2, True)
+            else:
+                button_off(2)
+
+
             if go or advance:
                 advance = False
                 if (n > 0) and ((n % 20) == 0):
                     display.show(g1)
                     gridmap(b1,random.choice(all_gliders),True)
                     display.show(g2)
+                    #apply_life_rule(b2, b1, buttons_down)
                 else:
-                    display.show(g1)
-                    apply_life_rule(b1, b2)
-                    display.show(g2)
-                    apply_life_rule(b2, b1)
+                    if up:
+                        display.show(g1)
+                        apply_life_rule(b1, b2)
+                        up = False
+                    else:
+                        display.show(g2)
+                        apply_life_rule(b2, b1)
+                        up = True
 
                 n += 1
         else:
