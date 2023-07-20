@@ -355,44 +355,74 @@ def rotate_bitmatrix(g):
     for i in g:
         row = 0
         for j in i:
-            n[row][col] = chr(j)
+            n[row][col] = j
             row += 1
         col -= 1
     nn = []
     for i in n:
-        nn.append(str.encode(''.join(i)))
+        nn.append(''.join(i))
     return nn
 
 unrotated_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copperhead,conway,solcube_2]
+rotated_gliders = []
 all_gliders = []
 
+# add 3 copies of each glider, each rotated +90deg
 for i in unrotated_gliders:
+    rotated_gliders.append(i)
+    for j in range(3):
+        rotated_gliders.append(rotate_bitmatrix(i).copy())
+
+for i in rotated_gliders:
     # pad all gliders with 12 extra spaces and 8 extra lines
+    # add a box around them to
     padded = []
     padded_width = 0
+    alternate = True
     for j in i:
-        jj = '      ' + j
-        jj = jj + '      '
+        jj = '       ' + j
+        jj = jj + '       '
+        box = ' '
+        if alternate:
+            box = '+'
+            alternate = False
+        else:
+            alternate = True
+        jj = box + jj + box
         padded_width = len(jj)
         padded.append(str.encode(jj))
-    vertical_spacer = str.encode(' ' * padded_width)
-    padded.insert(0,vertical_spacer)
-    padded.insert(0,vertical_spacer)
-    padded.insert(0,vertical_spacer)
-    padded.insert(0,vertical_spacer)
-    padded.append(vertical_spacer)
-    padded.append(vertical_spacer)
-    padded.append(vertical_spacer)
-    padded.append(vertical_spacer)
+
+    vertical_spacer = (' ' * (padded_width - 2))
+    vertical_box = str.encode('+ ' * (padded_width//2))
+
+    b = '+'
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = ' '
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = '+'
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = ' '
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = '+'
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    padded.insert(0,vertical_box)
+
+    b = '+'
+    padded.append(str.encode(b + vertical_spacer + b))
+    b = ' '
+    padded.append(str.encode(b + vertical_spacer + b))
+    b = '+'
+    padded.append(str.encode(b + vertical_spacer + b))
+    b = ' '
+    padded.append(str.encode(b + vertical_spacer + b))
+    b = '+'
+    padded.append(str.encode(b + vertical_spacer + b))
+    padded.append(vertical_box)
 
     all_gliders.append(padded.copy())
 
-    # add 3 copies of each glider, each rotated +90deg
-    n = padded
-    for j in range(3):
-        n = rotate_bitmatrix(n.copy())
-        all_gliders.append(n.copy())
-
+del(unrotated_gliders)
+del(rotated_gliders)
 
 
 # do multiple things timing loop - half second, second, 2 second
@@ -428,16 +458,15 @@ button_down_fast_step = 100 #ms
 
 
 
-SCALE = 1
-b1 = displayio.Bitmap(display.width//SCALE, display.height//SCALE, 2)
-b2 = displayio.Bitmap(display.width//SCALE, display.height//SCALE, 2)
+b1 = displayio.Bitmap(display.width, display.height, 2)
+b2 = displayio.Bitmap(display.width, display.height, 2)
 palette = displayio.Palette(2)
 tg1 = displayio.TileGrid(b1, pixel_shader=palette)
 tg2 = displayio.TileGrid(b2, pixel_shader=palette)
-g1 = displayio.Group(scale=SCALE)
+g1 = displayio.Group()
 g1.append(tg1)
 display.show(g1)
-g2 = displayio.Group(scale=SCALE)
+g2 = displayio.Group()
 g2.append(tg2)
 
 
@@ -471,9 +500,9 @@ def apply_life_rule(old, new):
         for c_x in range(width):
             xp1 = (c_x + 1) % width
             neighbors = (
-                old[xm1 + ym1]      + old[xm1 + yyy] + old[xm1 + yp1] +
-                old[c_x   + ym1]    +                  old[c_x   + yp1] +
-                old[xp1 + ym1]      + old[xp1 + yyy] + old[xp1 + yp1])
+                old[xm1 + ym1]      + old[xm1 + yyy]    + old[xm1 + yp1] +
+                old[c_x + ym1]      +                     old[c_x + yp1] +
+                old[xp1 + ym1]      + old[xp1 + yyy]    + old[xp1 + yp1])
             new[c_x+yyy] = neighbors == 3 or (neighbors == 2 and old[c_x+yyy])
             xm1 = c_x
 
@@ -577,19 +606,15 @@ def buttons_update_all():
 
 while True:
     if cube_map == 0 or cube_map == 2:
-        button_off(2)
         if not buttons_raw[0].value:
             cube_map = 1
             palette[1] = nonblack_randomcolor()
             button_off(0)
-#            clear_output(b1)
-#            randomize(b1)
         else:
-            #print(str(flash))
+            button_off(2)
             dc = -1
             if flash > 2000:  #every 2sec flash the leftmost button
                 dc,state = button_light_pulse(0, True)
-                #print(str(flash) + " dc " + str(dc) + ', state: ' + str(state))
             if flash > 0 and dc == 0:
                 last_flash_time = supervisor.ticks_ms()
                 flash = 0
@@ -650,11 +675,13 @@ while True:
 
             if go or advance:
                 advance = False
-                if (n > 0) and ((n % 20) == 0):
-                    display.show(g1)
-                    gridmap(b1,random.choice(all_gliders),True)
-                    display.show(g2)
-                    #apply_life_rule(b2, b1, buttons_down)
+                if (n > 0) and ((n % 35) == 0):
+                    if up:
+                        display.show(g1)
+                        gridmap(b1,random.choice(all_gliders),True)
+                    else:
+                        display.show(g2)
+                        gridmap(b2,random.choice(all_gliders),True)
                 else:
                     if up:
                         display.show(g1)
