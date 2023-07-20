@@ -1,5 +1,5 @@
 #solcube - 20230306
-board_type = 'RP2040'
+board_is_rp2040 = True
 
 import random
 import board
@@ -8,18 +8,10 @@ import framebufferio
 import rgbmatrix
 import digitalio
 import supervisor
-import time
 import math
-from adafruit_debouncer import Debouncer
 from adafruit_seesaw.seesaw import Seesaw
 from adafruit_seesaw.digitalio import DigitalIO
 from adafruit_seesaw.pwmout import PWMOut
-#import time
-#import terminalio
-#import adafruit_display_text.label
-
-# The delay on the PWM cycles. Increase to slow down the LED pulsing, decrease to speed it up.
-delay = 0.001
 
 # For most boards.
 i2c = board.I2C()
@@ -34,7 +26,6 @@ for button_pin in button_pins:
     button.direction = digitalio.Direction.INPUT
     button.pull = digitalio.Pull.UP
     buttons_raw.append(button)
-    buttons.append(Debouncer(button))
 
 # LED pins in order (1, 2, 3, 4)
 led_pins = (12, 13, 0, 1)
@@ -48,7 +39,7 @@ displayio.release_displays()
 bit_depth_set = 2
 matrix = False
 
-if board_type == 'RP2040':
+if board_is_rp2040:
     #RP2040
     matrix = rgbmatrix.RGBMatrix(
         width=64, height=64, bit_depth=bit_depth_set,
@@ -221,19 +212,6 @@ conway = [
 '  + +   ',
 ]
 
-
-solcube_2 = [
-'                                                  ',
-' ++++++  ++++++  +     ++++  ++  ++  +++++   ++++ ',
-' +    +  +    +  +     +  +  +    +  +    +  +    ',
-' +       +    +  +     +     +    +  +    +  +    ',
-' ++++++  +    +  +     +     +    +  +++++   ++++ ',
-'      +  +    +  +     +     +    +  +    +  +    ',
-' +    +  +    +  +  +  +  +  +    +  +    +  +    ',
-' ++++++  ++++++  ++++  ++++  ++++++  +++++   ++++ ',
-'                                                  '
-]
-
 glider = [
 ' + ',
 '  +',
@@ -363,19 +341,20 @@ def rotate_bitmatrix(g):
         nn.append(''.join(i))
     return nn
 
-unrotated_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copperhead,conway,solcube_2]
+unrotated_gliders = [weekender,lobster,loafer,glider,spider,g30p5h2v0,g64p2h1v0,copperhead,conway]
 rotated_gliders = []
 all_gliders = []
 
 # add 3 copies of each glider, each rotated +90deg
 for i in unrotated_gliders:
-    rotated_gliders.append(i)
+    rotated_gliders.append(i.copy())
     for j in range(3):
         rotated_gliders.append(rotate_bitmatrix(i).copy())
 
+count = 1
 for i in rotated_gliders:
     # pad all gliders with 12 extra spaces and 8 extra lines
-    # add a box around them to
+    # add a box around them too
     padded = []
     padded_width = 0
     alternate = True
@@ -392,22 +371,22 @@ for i in rotated_gliders:
         padded_width = len(jj)
         padded.append(str.encode(jj))
 
-    vertical_spacer = (' ' * (padded_width - 2))
-    vertical_box = str.encode('+ ' * (padded_width//2))
+    vertical_spacer =   (' ' * (padded_width - 2))
+    vertical_box =      (' +' * (padded_width//2))
+
+    b = ' '
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = '+'
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = ' '
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = '+'
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    b = ' '
+    padded.insert(0,str.encode(b + vertical_spacer + b))
+    padded.insert(0,str.encode(vertical_box))
 
     b = '+'
-    padded.insert(0,str.encode(b + vertical_spacer + b))
-    b = ' '
-    padded.insert(0,str.encode(b + vertical_spacer + b))
-    b = '+'
-    padded.insert(0,str.encode(b + vertical_spacer + b))
-    b = ' '
-    padded.insert(0,str.encode(b + vertical_spacer + b))
-    b = '+'
-    padded.insert(0,str.encode(b + vertical_spacer + b))
-    padded.insert(0,vertical_box)
-
-    b = '+'
     padded.append(str.encode(b + vertical_spacer + b))
     b = ' '
     padded.append(str.encode(b + vertical_spacer + b))
@@ -417,9 +396,10 @@ for i in rotated_gliders:
     padded.append(str.encode(b + vertical_spacer + b))
     b = '+'
     padded.append(str.encode(b + vertical_spacer + b))
-    padded.append(vertical_box)
+    padded.append(str.encode(vertical_box))
 
     all_gliders.append(padded.copy())
+    count += 1
 
 del(unrotated_gliders)
 del(rotated_gliders)
@@ -448,15 +428,8 @@ cube_map = 0
 life_iterations = 300
 button_led_timeouts=[0,0,0,0]
 button_led_direction=[0,0,0,0]
-button_debounce_timeout = [0,0,0,0]
-debounce_threshold = 1
 duty_cycle_ceiling = 65535
 duty_cycle_step = 8000
-
-button_down_step_timing = 250 #ms
-button_down_fast_step = 100 #ms
-
-
 
 b1 = displayio.Bitmap(display.width, display.height, 2)
 b2 = displayio.Bitmap(display.width, display.height, 2)
@@ -517,7 +490,7 @@ def clear_output(output):
 
 # Fill the grid with a bitmap
 def gridmap(output,bitst,rando=False):
-    x_offset = (output.width - len(bitst[0]))//2
+    x_offset = 0 #(output.width - len(bitst[0]))//2
     y_offset = 0
     if rando:
         x_offset = math.floor(random.random() * (output.width  - len(bitst[0])))
@@ -526,7 +499,10 @@ def gridmap(output,bitst,rando=False):
         y = output.height - len(bitst) - y_offset + i
         for j, cj in enumerate(si):
             x = x_offset + j
-            output[x, y] = cj & 1
+            try:
+                output[x, y] = cj & 1
+            except IndexError as e:
+                print(x,y,x_offset,y_offset,output.width,output.height,e)
 
 def button_light_pulse(btn, without_press = False):
     state = -1
@@ -561,30 +537,10 @@ def nonblack_randomcolor():
         b = random.randint(0,255)
     return (r,g,b)
 
-
 def button_off(btn):
     leds[btn].duty_cycle = 0
 
-def button_pushed(btn):
-    buttons[btn].update()
-    if buttons[btn].fell:
-        leds[btn].duty_cycle = duty_cycle_ceiling
-        return True 
-        # if button_debounce_timeout[btn] > debounce_threshold:
-        #     button_led_timeouts[btn] = duty_cycle_ceiling
-        #     leds[btn].duty_cycle = button_led_timeouts[btn] if button_led_timeouts[btn] < duty_cycle_ceiling else duty_cycle_ceiling
-        #     button_debounce_timeout[btn] = 0
-        #     return True 
-        # else:
-        #     button_debounce_timeout[btn] += 1
-        #     return False
-    elif buttons[btn].rose:
-        leds[btn].duty_cycle = 0
-        return False
-        # if button_debounce_timeout[btn] > 0:
-        #     button_led_timeouts[btn] = 0
-        #     leds[btn].duty_cycle = button_led_timeouts[btn]
-        #     button_debounce_timeout[btn] = 0
+
 
 ticks = 0
 start_time = supervisor.ticks_ms()
@@ -595,14 +551,6 @@ go = True
 sparse = True
 palette[1] = 0xff0000
 up = True
-
-def buttons_update_all():
-    return [
-        button_pushed(0),
-        button_pushed(1),
-        button_pushed(2),
-        button_pushed(3),
-    ]
 
 while True:
     if cube_map == 0 or cube_map == 2:
