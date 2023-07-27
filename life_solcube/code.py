@@ -1,5 +1,5 @@
 #solcube - 20230306
-board_is_rp2040 = True
+board_is_rp2040 = False
 
 import random
 import board
